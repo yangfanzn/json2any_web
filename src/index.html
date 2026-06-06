@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>json2http - JSON转HTTP请求代码生成工具 | 微信小程序TypeScript Agent | 多语言接口代码生成</title>
+    <meta name="description" content="json2http 是一款 JSON 转 HTTP 请求代码的生成工具，支持 Dart、ArkTS、TypeScript、Kotlin、Swift 等多种语言，内置多种 Agent（含微信小程序 typescript_weixin@3），一键生成类型安全的接口请求代码和实体类，专为微信小程序开发优化。">
+    <meta name="keywords" content="json2any,json转HTTP代码,微信小程序TypeScript,小程序Agent,json2http,json2class,接口代码生成,HTTP请求生成,JSON5,TypeScript,Dart,ArkTS,Kotlin,Swift,序列化,反序列化">
+    <meta name="author" content="Yang Fan">
+    <meta name="robots" content="index, follow">
+    <meta name="baidu-site-verification" content="codeva-lIHljRZ9cO" />
+    <link rel="canonical" href="https://json2http.yangfanzn.com">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="json2http - JSON转HTTP请求代码生成工具 | 微信小程序TypeScript Agent | 多语言接口代码生成">
+    <meta property="og:description" content="一份 JSON 配置，生成多语言的 HTTP 请求代码和实体类，内置多种 Agent（含微信小程序 typescript_weixin@3），专为微信小程序 TypeScript 环境优化。">
+    <meta property="og:url" content="https://json2http.yangfanzn.com">
+    <meta property="og:site_name" content="json2http">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:image" content="https://json2http.yangfanzn.com/icon.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "SoftwareApplication",
+                "@id": "#app",
+                "name": "json2http",
+                "description": "JSON 转 HTTP 请求代码和实体类生成工具，支持 Dart、ArkTS、TypeScript、Kotlin、Swift，内置多种 Agent（含微信小程序 TypeScript Agent）",
+                "url": "https://json2http.yangfanzn.com",
+                "applicationCategory": "DeveloperApplication",
+                "operatingSystem": "Cross-platform",
+                "programmingLanguage": ["TypeScript", "Dart", "ArkTS", "Kotlin", "Swift"],
+                "image": "https://json2http.yangfanzn.com/image.png",
+                "screenshot": "https://json2http.yangfanzn.com/image.png",
+                "offers": {
+                    "@type": "Offer",
+                    "price": "0",
+                    "priceCurrency": "CNY"
+                },
+                "author": {
+                    "@type": "Person",
+                    "name": "Yang Fan",
+                    "email": "yangfanzn@gmail.com"
+                },
+                "license": "https://opensource.org/licenses/ISC"
+            },
+            {
+                "@type": "WebSite",
+                "@id": "#website",
+                "name": "json2http — JSON 转 HTTP 请求代码生成",
+                "url": "https://json2http.yangfanzn.com",
+                "description": "从 JSON5 接口配置一键生成多语言类型安全的 HTTP 请求代码和实体类",
+                "inLanguage": "zh-CN",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://json2http.yangfanzn.com/?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
+            },
+            {
+                "@type": "FAQPage",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "json2http 和 json2class 有什么区别？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "json2http 是主要工具，从 JSON5 接口配置生成完整的 HTTP 请求代码（Plan、Agent、参数/响应实体类）。json2class 是底层依赖，负责生成实体类代码（fromJson/toJson 等序列化方法），也可独立使用。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "微信小程序为什么要用 typescript_weixin@3 Agent？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "微信小程序运行在沙箱环境中，不支持 XMLHttpRequest 和 fetch API。typescript_weixin@3 直接封装 wx.request()，零依赖零 polyfill，还支持 require.async() 分包懒加载，是微信小程序的最佳选择。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "JSON5 和 JSON 有什么区别？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "JSON5 是 JSON 的扩展，支持注释、尾逗号、无引号键名、多行字符串等，更适合人类编写和阅读配置文件。json2http 同时支持 JSON 和 JSON5 格式输入。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "可选字段怎么定义？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "在字段名后加 ? 即可声明为可选（nullable）。例如 \"email?\": \"\" 生成 email: string | null = null。数组元素也可标记可选。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "生成的代码可以修改吗？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "生成的代码不建议手动修改，下次生成会覆盖。推荐通过 JSON 配置调整，或继承 Agent 抽象类扩展自定义逻辑。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "支持哪些安装方式？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "推荐 Node.js 环境 npx json2class build。Flutter/Dart 用 dart pub add。HarmonyOS 用 ohpm install。"
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "未来还会支持哪些语言？",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "计划支持 Java 和 Objective-C。当前已支持 Dart@3、ArkTS@12、TypeScript@5、Kotlin@1.3、Swift@5.7 等多种语言。"
+                        }
+                    }
+                ]
+            },
+            {
+                "@type": "HowTo",
+                "name": "json2http 三步上手教程",
+                "description": "安装 → 编写接口配置 → 使用生成的代码发起类型安全的 HTTP 请求",
+                "step": [
+                    {
+                        "@type": "HowToStep",
+                        "position": 1,
+                        "name": "安装 & 运行",
+                        "text": "执行 npx json2http build -l typescript@5 使用默认 fetch Agent，或加 -a typescript_weixin@3 指定微信小程序 Agent。"
+                    },
+                    {
+                        "@type": "HowToStep",
+                        "position": 2,
+                        "name": "编写接口配置",
+                        "text": "创建 api.json5 文件，定义接口路径、HTTP 方法、请求参数和响应结构，JSON5 格式支持注释和尾逗号。"
+                    },
+                    {
+                        "@type": "HowToStep",
+                        "position": 3,
+                        "name": "使用生成的代码",
+                        "text": "通过 Json2http.setPlan 配置 baseURL 和全局拦截，调用 Json2http.single 方法发起类型安全的请求，响应字段有完整类型提示。"
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe',
+                            300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1',
+                            600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+        .dark pre[class*="language-"] { background: #1e1e2e; border: 1px solid #313244; }
+        .dark code[class*="language-"] { text-shadow: none; }
+        .reveal-section { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .reveal-section.visible { opacity: 1; transform: translateY(0); }
+        .gradient-text { background: linear-gradient(135deg, #818cf8, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-bg { background-image: radial-gradient(circle at 25% 25%, rgba(99,102,241,0.08) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(168,85,247,0.06) 0%, transparent 50%); }
+        .feature-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(99,102,241,0.15); }
+        .lang-badge { transition: transform 0.2s ease; }
+        .lang-badge:hover { transform: scale(1.08); }
+        .mobile-nav-overlay { transition: opacity 0.3s ease; }
+        .mobile-nav-panel { transition: transform 0.3s ease; }
+    </style>
+</head>
+
+<body class="dark bg-gray-950 text-gray-200 antialiased">
+
+    <!-- ==================== HEADER NAV ==================== -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800/50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#hero" class="flex items-center gap-2.5 group">
+                <img src="icon.png" alt="json2http logo" class="w-8 h-8 rounded-md">
+                <span class="text-2xl font-bold gradient-text">json2http</span>
+                <span class="hidden sm:inline text-xs text-gray-400 border border-gray-700 rounded px-1.5 py-0.5 group-hover:border-brand-500 transition-colors">JSON → Code</span>
+            </a>
+            <div class="hidden md:flex items-center gap-6 text-sm">
+                <a href="#features" class="text-gray-400 hover:text-brand-400 transition-colors" data-i18n="nav.features">功能</a>
+                <a href="#weixin" class="text-gray-400 hover:text-brand-400 transition-colors font-medium" data-i18n="nav.weixin">微信小程序</a>
+                <a href="#tutorial" class="text-gray-400 hover:text-brand-400 transition-colors" data-i18n="nav.tutorial">教程</a>
+                <a href="#demo" class="text-gray-400 hover:text-brand-400 transition-colors" data-i18n="nav.demo">演示</a>
+                <a href="#faq" class="text-gray-400 hover:text-brand-400 transition-colors" data-i18n="nav.faq">FAQ</a>
+                <button id="langToggle" onclick="toggleLang()" class="text-xs px-2 py-1 rounded border border-gray-700 text-gray-400 hover:text-brand-400 hover:border-brand-500 transition-colors" title="Switch Language">EN</button>
+                <a href="https://github.com/yangfanzn/json2any" target="_blank" rel="noopener" class="flex items-center gap-1.5 text-gray-400 hover:text-brand-400 transition-colors">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.51 0-.345-.015-1.26-.015-2.28-3.36.735-4.14-1.605-4.14-1.605-.555-1.425-1.35-1.8-1.35-1.8-1.11-.765.075-.765.075-.765 1.23.075 1.875 1.23 1.875 1.23 1.095 1.875 2.88 1.35 3.585.975.105-1.14.42-1.875.765-2.295-2.7-.3-5.52-1.35-5.52-6.03 0-1.35.495-2.46 1.23-3.36-.12-.3-.54-1.62.12-3.36 0 0 1.005-.3 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.53 3.3-1.23 3.3-1.23.66 1.74.24 3.06.12 3.36.765.9 1.23 2.01 1.23 3.36 0 4.68-2.82 5.73-5.52 6.03.42.36.81 1.095.81 2.295 0 1.65-.015 2.985-.015 3.39 0 .255.225.555.825.51C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <span data-i18n="nav.github">GitHub</span>
+                </a>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-400 hover:text-brand-400 transition-colors" aria-label="Navigation menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+        </nav>
+    </header>
+
+    <!-- ==================== MOBILE NAV ==================== -->
+    <div id="mobileNavOverlay" class="mobile-nav-overlay fixed inset-0 z-40 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none md:hidden" onclick="closeMobileNav()"></div>
+    <div id="mobileNavPanel" class="mobile-nav-panel fixed right-0 top-0 bottom-0 w-72 z-50 bg-gray-900 border-l border-gray-700/50 shadow-2xl translate-x-full md:hidden">
+        <div class="flex flex-col h-full">
+            <!-- Close button -->
+            <div class="flex items-center justify-between px-5 h-16 border-b border-gray-800/50 shrink-0">
+                    <span class="text-sm font-medium text-gray-400" data-i18n="nav.menu">导航菜单</span>
+                    <button onclick="closeMobileNav()" class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors" aria-label="Close menu">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <!-- Nav links -->
+                <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                    <a href="#features" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all">
+                        <span class="w-8 h-8 rounded-lg bg-green-900/50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </span>
+                        <span class="text-base" data-i18n="nav.features">功能</span>
+                    </a>
+                    <a href="#weixin" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-brand-300 hover:text-brand-200 bg-brand-900/20 hover:bg-brand-900/30 transition-all">
+                        <span class="w-8 h-8 rounded-lg bg-brand-900/50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </span>
+                        <span class="text-base font-medium" data-i18n="nav.weixin">微信小程序</span>
+                    </a>
+                    <a href="#tutorial" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all">
+                        <span class="w-8 h-8 rounded-lg bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </span>
+                        <span class="text-base" data-i18n="nav.tutorial">教程</span>
+                    </a>
+                    <a href="#demo" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all">
+                        <span class="w-8 h-8 rounded-lg bg-purple-900/50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </span>
+                        <span class="text-base" data-i18n="nav.demo">演示</span>
+                    </a>
+                    <a href="#faq" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all">
+                        <span class="w-8 h-8 rounded-lg bg-amber-900/50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </span>
+                        <span class="text-base" data-i18n="nav.faq">FAQ</span>
+                    </a>
+                    <div class="pt-3 mt-3 border-t border-gray-800/50">
+                        <button onclick="toggleLang()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all w-full text-left">
+                            <span class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                            </span>
+                            <span class="text-base" id="mobileLangLabel">English</span>
+                        </button>
+                        <a href="https://github.com/yangfanzn/json2any" target="_blank" rel="noopener" onclick="closeMobileNav()" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/60 transition-all">
+                            <span class="w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.51 0-.345-.015-1.26-.015-2.28-3.36.735-4.14-1.605-4.14-1.605-.555-1.425-1.35-1.8-1.35-1.8-1.11-.765.075-.765.075-.765 1.23.075 1.875 1.23 1.875 1.23 1.095 1.875 2.88 1.35 3.585.975.105-1.14.42-1.875.765-2.295-2.7-.3-5.52-1.35-5.52-6.03 0-1.35.495-2.46 1.23-3.36-.12-.3-.54-1.62.12-3.36 0 0 1.005-.3 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.53 3.3-1.23 3.3-1.23.66 1.74.24 3.06.12 3.36.765.9 1.23 2.01 1.23 3.36 0 4.68-2.82 5.73-5.52 6.03.42.36.81 1.095.81 2.295 0 1.65-.015 2.985-.015 3.39 0 .255.225.555.825.51C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                            </span>
+                            <span class="text-base" data-i18n="nav.github">GitHub</span>
+                            <svg class="w-3.5 h-3.5 text-gray-500 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    <!-- END MOBILE NAV -->
+
+    <main>
+        <!-- ==================== HERO ==================== -->
+        <section id="hero" class="hero-bg min-h-screen flex items-center pt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 md:py-20">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                            <span class="gradient-text">json2http</span><br>
+                            <span class="text-gray-100" data-i18n="hero.title1">JSON 转 HTTP 请求代码</span><br>
+                            <span class="text-gray-400 text-2xl sm:text-3xl lg:text-4xl" data-i18n="hero.title2">一键生成多语言接口代码</span>
+                        </h1>
+                        <h2 class="mt-8 text-lg sm:text-xl text-gray-300 leading-relaxed" data-i18n-html="hero.desc">
+                            一份 JSON5 接口配置，自动生成 <strong class="text-brand-400">多种语言</strong> 的 HTTP 请求代码和实体类。
+                            内置 <strong class="text-brand-400">多种 Agent</strong>，专为 <strong class="text-brand-400">微信小程序 TypeScript</strong> 环境优化
+                            <code class="text-brand-300 bg-brand-900/30 px-1.5 py-0.5 rounded text-sm font-mono">typescript_weixin@3</code>。
+                        </h2>
+                        <div class="mt-6 flex flex-wrap gap-2">
+                            <span class="lang-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-900/40 text-green-300 border border-green-700/50" data-i18n="hero.badge1">JSON转HTTP代码</span>
+                            <span class="lang-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-900/40 text-brand-300 border border-brand-700/50" data-i18n="hero.badge2">微信小程序TS</span>
+                            <span class="lang-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-900/40 text-purple-300 border border-purple-700/50" data-i18n="hero.badge3">多Agent</span>
+                            <span class="lang-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-cyan-900/40 text-cyan-300 border border-cyan-700/50" data-i18n="hero.badge4">接口代码生成</span>
+                            <span class="lang-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-900/40 text-amber-300 border border-amber-700/50" data-i18n="hero.badge5">多语言</span>
+                        </div>
+                        <div class="mt-8 flex flex-wrap gap-4">
+                            <a href="#tutorial" class="inline-flex items-center px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-medium rounded-lg transition-colors shadow-lg shadow-brand-600/20" data-i18n="hero.cta1">
+                                快速开始 <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                            </a>
+                            <a href="https://github.com/yangfanzn/json2any" target="_blank" rel="noopener" class="inline-flex items-center px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium rounded-lg transition-colors border border-gray-700">
+                                <svg class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.51 0-.345-.015-1.26-.015-2.28-3.36.735-4.14-1.605-4.14-1.605-.555-1.425-1.35-1.8-1.35-1.8-1.11-.765.075-.765.075-.765 1.23.075 1.875 1.23 1.875 1.23 1.095 1.875 2.88 1.35 3.585.975.105-1.14.42-1.875.765-2.295-2.7-.3-5.52-1.35-5.52-6.03 0-1.35.495-2.46 1.23-3.36-.12-.3-.54-1.62.12-3.36 0 0 1.005-.3 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.53 3.3-1.23 3.3-1.23.66 1.74.24 3.06.12 3.36.765.9 1.23 2.01 1.23 3.36 0 4.68-2.82 5.73-5.52 6.03.42.36.81 1.095.81 2.295 0 1.65-.015 2.985-.015 3.39 0 .255.225.555.825.51C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                                <span data-i18n="hero.cta2">查看源码</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <div class="bg-gray-900/80 border border-gray-800 rounded-xl p-5 font-mono text-sm shadow-2xl shadow-brand-600/10">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-gray-500 text-xs" data-i18n="hero.install">快速安装</span>
+                            </div>
+                            <code class="text-brand-400">npx json2http build -l typescript@5 -a typescript_weixin@3</code>
+                            <div class="mt-4 border-t border-gray-800 pt-4">
+                                <span class="text-gray-500 text-xs mb-2 block" data-i18n="hero.convert">JSON5 接口配置 → HTTP 请求代码</span>
+                                <pre class="!m-0 !p-0 !bg-transparent text-xs overflow-x-auto">
+                                    <code class="language-json5">
+    {
+        '/api/user/info': { 
+            method: 'GET', 
+            params: { id: '' }, 
+            res: { code: 0, data: { name: '' } } 
+        } 
+    }
+                                    </code>
+                                </pre>
+                                <div class="mt-2 text-xs text-gray-500" data-i18n="hero.arrow">↓ 自动生成 ↓</div>
+                                <pre class="!m-0 !p-0 !bg-transparent text-xs overflow-x-auto mt-2"><code class="language-typescript">// Plan + Agent + 实体类，一键生成
+const result = await Json2http.single.apiuserinfo((p) => {
+  p.params.id = '123';
+});
+console.log(result.res.data.name); // string</code></pre>
+                            </div>
+                            <div class="mt-4 border-t border-gray-800 pt-4">
+                                <span class="text-gray-500 text-xs mb-2 block" data-i18n="hero.multi">支持多种语言 × 多种 Agent</span>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="text-xs px-2 py-0.5 rounded bg-blue-900/40 text-blue-300">Dart@3</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-orange-900/40 text-orange-300">ArkTS@12</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-brand-900/40 text-brand-300">TS@5</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-purple-900/40 text-purple-300">Kotlin@1.3</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-red-900/40 text-red-300">Swift@5.7</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="text-xs px-2 py-0.5 rounded bg-blue-900/40 text-blue-300">dio@5</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-orange-900/40 text-orange-300">rcp@12</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-brand-900/40 text-brand-300">axios@1</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-cyan-900/40 text-cyan-300">fetch@0</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-green-900/40 text-green-300 font-bold">weixin@3</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-purple-900/40 text-purple-300">okhttp@4</span>
+                                    <span class="text-xs px-2 py-0.5 rounded bg-red-900/40 text-red-300">alamofire@5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Mobile: show install block inline -->
+                    <div class="lg:hidden bg-gray-900/80 border border-gray-800 rounded-lg p-4 font-mono text-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-500 text-xs" data-i18n="hero.install">快速安装</span>
+                        </div>
+                        <code class="text-brand-400">npx json2http build -l typescript@5 -a typescript_weixin@3</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== FEATURES ==================== -->
+        <section id="features" class="reveal-section py-20 md:py-28 bg-gray-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n-html="features.title">核心能力：JSON 转实体类 &amp; HTTP 请求代码</h2>
+                    <p class="mt-4 text-gray-400 max-w-2xl mx-auto" data-i18n="features.subtitle">json2http 从 JSON5 接口配置到类型安全的 HTTP 请求代码，覆盖请求生成、Agent 适配、序列化、容错处理全链路</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <article class="feature-card bg-gray-900/60 border border-green-800/30 rounded-xl p-6">
+                        <div class="w-10 h-10 bg-green-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2" data-i18n="features.card1.title">JSON → HTTP 请求代码</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n-html="features.card1.desc">一份 JSON5 接口配置，自动生成完整的 HTTP 请求代码（Plan + Agent + 参数/响应类），内置多种 Agent 适配各平台网络库。</p>
+                        <div class="mt-4 flex flex-wrap gap-1.5">
+                            <span class="text-xs px-2 py-0.5 rounded bg-blue-900/40 text-blue-300">dio@5</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-orange-900/40 text-orange-300">rcp@12</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-brand-900/40 text-brand-300">axios@1</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-cyan-900/40 text-cyan-300">fetch@0</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-green-900/40 text-green-300 font-bold">weixin@3</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-purple-900/40 text-purple-300">okhttp@4</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-red-900/40 text-red-300">alamofire@5</span>
+                        </div>
+                    </article>
+                    <article class="feature-card bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <div class="w-10 h-10 bg-purple-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2" data-i18n="features.card2.title">序列化 / 反序列化</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n-html="features.card2.desc">生成的实体类自带 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromJson()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toJson()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromPreset()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toNew()</code> 四种方法，请求参数和响应数据自动序列化。</p>
+                    </article>
+                    <article class="feature-card bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <div class="w-10 h-10 bg-cyan-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2" data-i18n="features.card3.title">类型引用 & 递归支持</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n-html="features.card3.desc">通过 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> 引用跨文件类型，支持递归结构（如树形、链表），避免重复定义。</p>
+                    </article>
+                    <article class="feature-card bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <div class="w-10 h-10 bg-amber-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .879-3 2s1.343 2 3 2 3 .879 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1h-2m2 1h2"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2" data-i18n="features.card4.title">可选字段 & 默认值</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n-html="features.card4.desc">字段名加 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">?</code> 后缀即可声明可选（nullable），未标记字段自动赋予类型默认值，告别繁琐的 null 检查。</p>
+                    </article>
+                    <article class="feature-card bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <div class="w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2" data-i18n="features.card5.title">数据容错规则</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n-html="features.card5.desc">四种规则控制异常数据处理：<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">DiffType</code>（类型不匹配）、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissKey</code>（缺失字段）、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MoreIndex</code>/<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissIndex</code>（数组越界），全局/实例/单次三级配置。</p>
+                    </article>
+                    <article class="feature-card bg-gray-900/60 border border-gray-800 rounded-xl p-6 opacity-80">
+                        <div class="w-10 h-10 bg-brand-900/50 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 4l4 4-4 4"/></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2"><span data-i18n="features.card6.title">JSON → 多语言实体类</span> <span class="text-xs text-gray-500 ml-1" data-i18n="features.card6.subtitle">(底层依赖)</span></h3>
+                        <p class="text-gray-400 text-sm leading-relaxed" data-i18n="features.card6.desc">json2class 是 json2http 的底层依赖，自动生成 Dart、ArkTS、TypeScript、Kotlin、Swift 等多种语言的类型安全实体类代码，也可独立使用。</p>
+                        <div class="mt-4 flex flex-wrap gap-1.5">
+                            <span class="text-xs px-2 py-0.5 rounded bg-blue-900/40 text-blue-300">Dart@3</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-orange-900/40 text-orange-300">ArkTS@12</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-brand-900/40 text-brand-300">TS@5</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-purple-900/40 text-purple-300">Kotlin@1.3</span>
+                            <span class="text-xs px-2 py-0.5 rounded bg-red-900/40 text-red-300">Swift@5.7</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== WEIXIN MINI PROGRAM ==================== -->
+        <section id="weixin" class="reveal-section py-20 md:py-28 bg-gray-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n="weixin.title">微信小程序 TS Agent — 小程序 Agent 最佳实践</h2>
+                    <h3 class="mt-3 text-xl text-gray-300" data-i18n-html="weixin.subtitle">
+                        <code class="text-brand-300 bg-brand-900/30 px-2 py-1 rounded font-mono">typescript_weixin@3</code> — 专为微信小程序打造的 HTTP Agent
+                    </h3>
+                    <p class="mt-4 text-gray-400 max-w-2xl mx-auto" data-i18n="weixin.desc">json2http 是目前唯一内置微信小程序 TypeScript Agent 的 JSON 代码生成工具，直接封装 wx.request()，无需 polyfill，支持分包懒加载、Token 刷新、全局拦截。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+                    <div class="bg-gray-900/80 border border-green-800/50 rounded-lg p-5 text-center">
+                        <div class="text-2xl font-bold text-green-400 mb-1" data-i18n="weixin.stat1">wx.request()</div>
+                        <div class="text-sm text-gray-400" data-i18n="weixin.stat1d">原生封装，零 polyfill</div>
+                    </div>
+                    <div class="bg-gray-900/80 border border-brand-800/50 rounded-lg p-5 text-center">
+                        <div class="text-2xl font-bold text-brand-400 mb-1" data-i18n="weixin.stat2">require.async()</div>
+                        <div class="text-sm text-gray-400" data-i18n="weixin.stat2d">分包懒加载架构</div>
+                    </div>
+                    <div class="bg-gray-900/80 border border-purple-800/50 rounded-lg p-5 text-center">
+                        <div class="text-2xl font-bold text-purple-400 mb-1" data-i18n="weixin.stat3">setPlan</div>
+                        <div class="text-sm text-gray-400" data-i18n="weixin.stat3d">全局拦截 & Token 刷新</div>
+                    </div>
+                    <div class="bg-gray-900/80 border border-amber-800/50 rounded-lg p-5 text-center">
+                        <div class="text-2xl font-bold text-amber-400 mb-1" data-i18n="weixin.stat4">FormData</div>
+                        <div class="text-sm text-gray-400" data-i18n="weixin.stat4d">自定义 UTF-8 编码</div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-brand-600 text-white text-sm font-bold">1</span>
+                            <span data-i18n="weixin.step1">编写 JSON5 接口配置</span>
+                        </h4>
+                        <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                <span class="text-xs text-gray-500 font-mono">api.json5</span>
+                            </div>
+                            <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-json5">{
+  '/api/blood/index': {
+    title: '宝宝血型计算',
+    method: 'GET',
+    params: {
+      father: '',
+      mother: '',
+    },
+    res: {
+      code: 0,
+      msg: '',
+      data: {
+        possible: [''],
+        impossible: [''],
+      },
+    },
+  },
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-brand-600 text-white text-sm font-bold">2</span>
+                            <span data-i18n="weixin.step2">运行生成命令（指定微信小程序 Agent）</span>
+                        </h4>
+                        <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                <span class="text-xs text-gray-500 font-mono">terminal</span>
+                            </div>
+                            <pre class="!m-0 !p-4 !bg-transparent text-sm"><code class="language-bash">npx json2http build -l typescript@5 -a typescript_weixin@3</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-brand-600 text-white text-sm font-bold">3</span>
+                            <span data-i18n="weixin.step3">生成的 TypeScript 代码（自动包含 WeixinAgent）</span>
+                        </h4>
+                        <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                <span class="text-xs text-gray-500 font-mono" data-i18n="tutorial.labels.generated">json2http.ts（生成产物）</span>
+                            </div>
+                            <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// 自动生成的请求 Plan 类
+export class apibloodindexplan extends Plan {
+  path = '/api/blood/index';
+  readonly title = '宝宝血型计算';
+  method = 'GET';
+  res = new apibloodindexres();
+  params = new apibloodindexparams();
+  body = null;
+  headers = {};
+}
+
+// 自动生成的响应实体类
+export class apibloodindexres extends Json2class {
+  code: number = 0;
+  msg: string = '';
+  data: apibloodindexresdata = new apibloodindexresdata();
+}
+
+export class apibloodindexresdata extends Json2class {
+  possible: string[] = [];
+  impossible: string[] = [];
+}
+
+// 自动生成的参数实体类
+export class apibloodindexparams extends Json2class {
+  father: string = '';
+  mother: string = '';
+}</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-600 text-white text-sm font-bold">4</span>
+                            <span data-i18n="weixin.step4">在微信小程序中使用</span>
+                        </h4>
+                        <div class="space-y-4">
+                            <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                                <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                    <span class="text-xs text-gray-500 font-mono" data-i18n="tutorial.labels.typeDecl">project.d.ts — 类型声明</span>
+                                </div>
+                                <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">type JSON2HTTP = typeof import('./miniprogram/json2http/json2http');
+
+interface IAppOption {
+  json2http: Promise&lt;JSON2HTTP&gt;;
+}</code></pre>
+                            </div>
+                            <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                                <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                    <span class="text-xs text-gray-500 font-mono" data-i18n="tutorial.labels.globalConfig">app.ts — 全局配置 & 分包加载</span>
+                                </div>
+                                <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">App&lt;IAppOption&gt;({
+  json2http: require.async('./json2http/json2http').then((e) => {
+    // 全局配置：baseURL、错误处理、Token 刷新
+    e.Json2http.setPlan = (plan) => {
+      plan.baseURL = 'https://api.example.com';
+      plan.process = (reply) => {
+        if (reply.data?.code !== 200) {
+          reply.error = reply.data?.msg;
+        }
+      };
+    };
+    return e;
+  }),
+});</code></pre>
+                            </div>
+                            <div class="relative bg-gray-900/80 border border-green-800/50 rounded-lg overflow-hidden">
+                                <div class="flex items-center justify-between px-4 py-2 border-b border-green-800/50">
+                                    <span class="text-xs text-green-400 font-mono" data-i18n="tutorial.labels.pageUsage">page.ts — 页面中使用</span>
+                                </div>
+                                <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">Page({
+  onLoad: async function() {
+    const app = getApp&lt;IAppOption&gt;();
+    const json2http = await app.json2http;
+
+    // 类型安全的请求调用
+    const result = await json2http.Json2http.single.apibloodindex((p) => {
+      p.params.father = 'A';
+      p.params.mother = 'O';
+    });
+
+    // 类型安全的响应访问
+    console.log(result.res.data.possible);   // string[]
+    console.log(result.res.data.impossible); // string[]
+    console.log(result.res.code);            // number
+    console.log(result.res.msg);             // string
+  }
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                    <h4 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="weixin.why">为什么选择 WeixinAgent 而不是 Axios 或 Fetch？</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="border-b border-gray-800">
+                                <th class="py-3 px-4 text-gray-400 text-left" data-i18n="weixin.table.feature">特性</th>
+                                <th class="py-3 px-4 text-brand-400 text-center font-medium">typescript_weixin@3</th>
+                                <th class="py-3 px-4 text-gray-400 text-center">typescript_axios@1</th>
+                                <th class="py-3 px-4 text-gray-400 text-center">typescript_fetch@0</th>
+                            </tr></thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4" data-i18n="weixin.table.native">微信小程序原生支持</td><td class="py-2.5 px-4 text-center text-green-400">✅ wx.request()</td><td class="py-2.5 px-4 text-center text-red-400" data-i18n="weixin.table.needPolyfill">❌ 需 polyfill</td><td class="py-2.5 px-4 text-center text-red-400" data-i18n="weixin.table.needPolyfill">❌ 需 polyfill</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4" data-i18n="weixin.table.lazy">分包懒加载</td><td class="py-2.5 px-4 text-center text-green-400">✅ require.async()</td><td class="py-2.5 px-4 text-center text-gray-500">—</td><td class="py-2.5 px-4 text-center text-gray-500">—</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4" data-i18n="weixin.table.form">Multipart FormData</td><td class="py-2.5 px-4 text-center text-green-400" data-i18n="weixin.table.customEncode">✅ 自定义编码</td><td class="py-2.5 px-4 text-center text-green-400">✅</td><td class="py-2.5 px-4 text-center text-yellow-400" data-i18n="weixin.table.partial">⚠️ 部分</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4" data-i18n="weixin.table.buffer">ArrayBuffer 支持</td><td class="py-2.5 px-4 text-center text-green-400">✅</td><td class="py-2.5 px-4 text-center text-green-400">✅</td><td class="py-2.5 px-4 text-center text-green-400">✅</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4" data-i18n="weixin.table.token">Token 自动刷新</td><td class="py-2.5 px-4 text-center text-green-400">✅ plan.after</td><td class="py-2.5 px-4 text-center text-green-400">✅</td><td class="py-2.5 px-4 text-center text-yellow-400" data-i18n="weixin.table.manual">⚠️ 手动</td></tr>
+                                <tr><td class="py-2.5 px-4" data-i18n="weixin.table.size">包体积影响</td><td class="py-2.5 px-4 text-center text-green-400" data-i18n="weixin.table.zeroDep">✅ 零依赖</td><td class="py-2.5 px-4 text-center text-red-400">❌ +13KB</td><td class="py-2.5 px-4 text-center text-yellow-400" data-i18n="weixin.table.needPolyfillWarn">⚠️ 需 polyfill</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TUTORIAL ==================== -->
+        <section id="tutorial" class="reveal-section py-20 md:py-28 bg-gray-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n-html="tutorial.title">快速使用教程：TS 实体生成 &amp; 接口代码</h2>
+                    <p class="mt-4 text-gray-400" data-i18n="tutorial.subtitle">三步上手 json2http，一份配置生成完整的 HTTP 请求代码</p>
+                </div>
+                <div class="bg-gray-900/60 border border-green-800/30 rounded-xl p-6 lg:p-8">
+                    <h3 class="text-xl font-semibold text-gray-100 mb-6 flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-900/50 text-green-400 text-sm font-bold">H</span>
+                        <span data-i18n="tutorial.json2http.h3">json2http — HTTP 请求代码生成</span>
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        <div>
+                            <h4 class="text-sm font-medium text-green-400 mb-2 flex items-center gap-1.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded bg-green-900/50 text-green-400 text-xs font-bold">1</span><span data-i18n="tutorial.step1">安装 & 运行</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-3 !bg-transparent text-sm"><code class="language-bash"># 默认使用 fetch Agent
+npx json2http build -l typescript@5
+
+# 指定微信小程序 Agent
+npx json2http build -l typescript@5 -a typescript_weixin@3</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-green-400 mb-2 flex items-center gap-1.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded bg-green-900/50 text-green-400 text-xs font-bold">2</span><span data-i18n="tutorial.step2">编写接口配置</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-3 !bg-transparent text-sm overflow-x-auto"><code class="language-json5">// api.json5
+{
+  '/api/user/info': {
+    title: '获取用户信息',
+    method: 'GET',
+    params: { id: '' },
+    res: {
+      code: 0,
+      data: { name: '', avatar: '' },
+    },
+  },
+}</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-medium text-green-400 mb-2 flex items-center gap-1.5"><span class="inline-flex items-center justify-center w-5 h-5 rounded bg-green-900/50 text-green-400 text-xs font-bold">3</span><span data-i18n="tutorial.step3">使用生成的代码</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-3 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// 全局配置
+Json2http.setPlan = (p) => {
+  p.baseURL = 'https://api.example.com';
+};
+
+// 发起请求
+const result = await Json2http.single.apiuserinfo((p) => {
+  p.params.id = '123';
+});
+console.log(result.res.data.name);    // string
+console.log(result.res.data.avatar);  // string</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 bg-gray-900/40 border border-gray-800 rounded-xl p-5">
+                    <h3 class="text-base font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-brand-900/50 text-brand-400 text-xs font-bold">C</span>
+                        <span data-i18n="tutorial.json2class.title">json2class — 实体类生成</span> <span class="text-xs text-gray-500" data-i18n="tutorial.json2class.subtitle">(底层依赖，也可独立使用)</span>
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div>
+                            <h4 class="text-xs font-medium text-brand-400 mb-1 flex items-center gap-1"><span class="inline-flex items-center justify-center w-4 h-4 rounded bg-brand-900/50 text-brand-400 text-[10px] font-bold">1</span><span data-i18n="tutorial.json2class.s1">安装</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-2 !bg-transparent text-xs"><code class="language-bash">npx json2class build -l typescript@5</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-medium text-brand-400 mb-1 flex items-center gap-1"><span class="inline-flex items-center justify-center w-4 h-4 rounded bg-brand-900/50 text-brand-400 text-[10px] font-bold">2</span><span data-i18n="tutorial.json2class.s2">配置</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-2 !bg-transparent text-xs overflow-x-auto"><code class="language-json5">// user.json5
+{ 
+    "user": { 
+        "id": 0, 
+        "name": "", 
+        "email?": "" 
+    } 
+}</code></pre>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-medium text-brand-400 mb-1 flex items-center gap-1"><span class="inline-flex items-center justify-center w-4 h-4 rounded bg-brand-900/50 text-brand-400 text-[10px] font-bold">3</span><span data-i18n="tutorial.json2class.s3">使用</span></h4>
+                            <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden">
+                                <pre class="!m-0 !p-2 !bg-transparent text-xs overflow-x-auto"><code class="language-typescript">const user = new rootuser();
+user.fromJson({ id: 1, name: 'Tom' });
+console.log(user.name); // "Tom"</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-gray-900/60 border border-green-800/30 rounded-xl p-6">
+                    <h3 class="text-xl font-semibold text-gray-100 mb-6 flex items-center gap-2">
+                        <svg class="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.371 0 0 4.617 0 10.308c0 3.298 2.057 6.228 5.143 7.86l-1.029 3.086L7.2 19.406c1.48.535 3.086.832 4.8.832 6.627 0 12-4.617 12-10.308C24 4.617 18.627 0 12 0zM7.2 6.857c.994 0 1.8.768 1.8 1.714 0 .947-.806 1.714-1.8 1.714-.993 0-1.8-.767-1.8-1.714 0-.946.807-1.714 1.8-1.714zm9.6 0c.994 0 1.8.768 1.8 1.714 0 .947-.806 1.714-1.8 1.714-.993 0-1.8-.767-1.8-1.714 0-.946.807-1.714 1.8-1.714z"/></svg>
+                        <span data-i18n="tutorial.weixin4.title">微信小程序专项 — 四步上手</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-gray-950/80 border border-gray-800 rounded-lg p-4">
+                            <div class="text-brand-400 font-bold text-lg mb-2">Step 1</div>
+                            <h4 class="text-sm font-medium text-gray-200 mb-1" data-i18n="tutorial.weixin4.s1t">生成代码</h4>
+                            <p class="text-xs text-gray-400" data-i18n-html="tutorial.weixin4.s1d">指定 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">-a typescript_weixin@3</code> 生成微信小程序专用代码</p>
+                        </div>
+                        <div class="bg-gray-950/80 border border-gray-800 rounded-lg p-4">
+                            <div class="text-brand-400 font-bold text-lg mb-2">Step 2</div>
+                            <h4 class="text-sm font-medium text-gray-200 mb-1" data-i18n="tutorial.weixin4.s2t">配置类型声明</h4>
+                            <p class="text-xs text-gray-400" data-i18n-html="tutorial.weixin4.s2d">在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">project.d.ts</code> 中声明 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">IAppOption</code> 接口</p>
+                        </div>
+                        <div class="bg-gray-950/80 border border-gray-800 rounded-lg p-4">
+                            <div class="text-brand-400 font-bold text-lg mb-2">Step 3</div>
+                            <h4 class="text-sm font-medium text-gray-200 mb-1" data-i18n="tutorial.weixin4.s3t">配置分包加载</h4>
+                            <p class="text-xs text-gray-400" data-i18n-html="tutorial.weixin4.s3d">在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.json</code> 中添加 subPackages，在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.ts</code> 中用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">require.async()</code> 懒加载</p>
+                        </div>
+                        <div class="bg-gray-950/80 border border-gray-800 rounded-lg p-4">
+                            <div class="text-green-400 font-bold text-lg mb-2">Step 4</div>
+                            <h4 class="text-sm font-medium text-gray-200 mb-1" data-i18n="tutorial.weixin4.s4t">页面中调用</h4>
+                            <p class="text-xs text-gray-400" data-i18n-html="tutorial.weixin4.s4d">通过 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">getApp().json2http</code> 获取实例，类型安全地调用接口</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-4" data-i18n="tutorial.cli.title">CLI 参数一览</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="border-b border-gray-800">
+                                <th class="py-2.5 px-4 text-gray-400 text-left" data-i18n="tutorial.cli.param">参数</th>
+                                <th class="py-2.5 px-4 text-gray-400 text-left" data-i18n="tutorial.cli.desc">说明</th>
+                                <th class="py-2.5 px-4 text-gray-400 text-left" data-i18n="tutorial.cli.example">示例</th>
+                            </tr></thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4 font-mono text-brand-300">-l, --language</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.langDesc">目标语言（必填）</td><td class="py-2.5 px-4 font-mono text-gray-400">typescript@5, dart@3</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4 font-mono text-brand-300">-a, --default-agent</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.agentDesc">HTTP Agent（json2http 专用）</td><td class="py-2.5 px-4 font-mono text-green-400">typescript_weixin@3</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4 font-mono text-brand-300">-s, --search</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.searchDesc">JSON 配置搜索目录</td><td class="py-2.5 px-4 font-mono text-gray-400">./config</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4 font-mono text-brand-300">-o, --output</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.outputDesc">输出目录</td><td class="py-2.5 px-4 font-mono text-gray-400">./src/generated</td></tr>
+                                <tr class="border-b border-gray-800/50"><td class="py-2.5 px-4 font-mono text-brand-300">-p, --package</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.packageDesc">包名</td><td class="py-2.5 px-4 font-mono text-gray-400">com.example.app</td></tr>
+                                <tr><td class="py-2.5 px-4 font-mono text-brand-300">-d, --debug</td><td class="py-2.5 px-4" data-i18n="tutorial.cli.debugDesc">启用调试输出</td><td class="py-2.5 px-4 font-mono text-gray-400">—</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== DEMO ==================== -->
+        <section id="demo" class="reveal-section py-20 md:py-28 bg-gray-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n-html="demo.title">代码生成演示：JSON 转实体类 &amp; HTTP 请求</h2>
+                    <p class="mt-4 text-gray-400" data-i18n="demo.subtitle">一份 JSON5 接口配置 → Plan + Agent + 参数/响应实体类，一键生成完整的 HTTP 请求代码</p>
+                </div>
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3" data-i18n="demo.input">输入：JSON5 接口配置</h3>
+                    <div class="relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono">api.json5</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-json5">{
+  '/api/order/detail': {
+    title: '订单详情',
+    method: 'GET',
+    params: { id: '' },
+    res: {
+      code: 0,
+      data: {
+        id: 0,
+        status: '',
+        items?: [""],       // 可选数组
+        total: 0,
+        address: {
+          city: '',
+          street: '',
+          zip: '',
+        },
+      },
+    },
+  },
+}</code></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-200 mb-3" data-i18n="demo.output">输出：HTTP 请求代码（Plan + Agent + 实体类）</h3>
+                    <div class="flex flex-wrap gap-2 mb-4" id="demoTabs">
+                        <button class="demo-tab px-4 py-2 rounded-lg text-sm font-medium bg-brand-600 text-white" data-lang="typescript" onclick="switchDemoTab('typescript')">TypeScript</button>
+                        <button class="demo-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-400 hover:text-gray-200" data-lang="dart" onclick="switchDemoTab('dart')">Dart</button>
+                        <button class="demo-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-400 hover:text-gray-200" data-lang="arkts" onclick="switchDemoTab('arkts')">ArkTS</button>
+                        <button class="demo-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-400 hover:text-gray-200" data-lang="kotlin" onclick="switchDemoTab('kotlin')">Kotlin</button>
+                        <button class="demo-tab px-4 py-2 rounded-lg text-sm font-medium bg-gray-800 text-gray-400 hover:text-gray-200" data-lang="swift" onclick="switchDemoTab('swift')">Swift</button>
+                    </div>
+                    <div id="demo-typescript" class="demo-content relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.ts">json2http.ts (Plan + Agent + 实体类)</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// ===== Plan 配置 =====
+export const Plan = {
+  '/api/order/detail': { method: 'GET', title: '订单详情' },
+};
+
+// ===== Agent 请求方法 =====
+export class Json2http {
+  static setPlan: (p: any) => void;
+
+  static single = {
+    apiorderdetail: async (fn: (p: any) => void) => {
+      const p = new apiorderdetailparams();
+      fn(p);
+      // fetch 请求逻辑...
+      return { res: new apiorderdetailres().fromJson(response) };
+    },
+  };
+}
+
+// ===== 参数实体类 =====
+export class apiorderdetailparams extends Json2class {
+  id: string = '';
+}
+
+// ===== 响应实体类 =====
+export class apiorderdetailres extends Json2class {
+  code: number = 0;
+  data: apiorderdetailresdata = new apiorderdetailresdata();
+}
+
+export class apiorderdetailresdata extends Json2class {
+  id: number = 0;
+  status: string = '';
+  items: string[] | null = null;  // 可选字段
+  total: number = 0;
+  address: apiorderdetailresdataaddress = new apiorderdetailresdataaddress();
+
+  fromJson(data: any, rule?: Rule): apiorderdetailresdata { /* ... */ }
+  toJson(): object { /* ... */ }
+}
+
+export class apiorderdetailresdataaddress extends Json2class {
+  city: string = '';
+  street: string = '';
+  zip: string = '';
+}</code></pre>
+                    </div>
+                    <div id="demo-dart" class="demo-content relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.dart">json2http.dart (Plan + Agent + 实体类)</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-dart">// ===== Plan 配置 =====
+const Plan = {
+  '/api/order/detail': { 'method': 'GET', 'title': '订单详情' },
+};
+
+// ===== Agent 请求方法 (dio) =====
+class Json2http {
+  static void Function(dynamic) setPlan;
+
+  static final single = _Json2httpSingle();
+
+  // apiorderdetail → Response<apiorderdetailres>
+}
+
+// ===== 参数实体类 =====
+class apiorderdetailparams extends Json2class {
+  String id = '';
+}
+
+// ===== 响应实体类 =====
+class apiorderdetailres extends Json2class {
+  num code = 0;
+  apiorderdetailresdata data = apiorderdetailresdata();
+}
+
+class apiorderdetailresdata extends Json2class {
+  num id = 0;
+  String status = '';
+  List&lt;String&gt;? items;  // 可选字段
+  num total = 0;
+  apiorderdetailresdataaddress address = apiorderdetailresdataaddress();
+
+  apiorderdetailresdata fromJson(dynamic data, {Rule? rule}) { /* ... */ }
+  Map&lt;String, dynamic&gt; toJson() { /* ... */ }
+}
+
+class apiorderdetailresdataaddress extends Json2class {
+  String city = '';
+  String street = '';
+  String zip = '';
+}</code></pre>
+                    </div>
+                    <div id="demo-arkts" class="demo-content relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.arkts">json2http.ets (Plan + Agent + 实体类)</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// ArkTS (HarmonyOS) — Plan + Agent + 实体类
+// ===== Plan 配置 =====
+const Plan = {
+  '/api/order/detail': { method: 'GET', title: '订单详情' },
+};
+
+// ===== Agent 请求方法 (rcp) =====
+class Json2http {
+  static setPlan: (p: object) => void;
+  static single = {
+    apiorderdetail: async (fn: (p: apiorderdetailparams) => void) => {
+      // rcp 请求逻辑...
+      return { res: new apiorderdetailres().fromJson(response) };
+    },
+  };
+}
+
+// ===== 参数/响应实体类 =====
+class apiorderdetailparams extends Json2class {
+  id: string = '';
+}
+
+class apiorderdetailres extends Json2class {
+  code: number = 0;
+  data: apiorderdetailresdata = new apiorderdetailresdata();
+}
+
+class apiorderdetailresdata extends Json2class {
+  id: number = 0;
+  status: string = '';
+  items: string[] | null = null;
+  total: number = 0;
+  address: apiorderdetailresdataaddress = new apiorderdetailresdataaddress();
+}
+
+class apiorderdetailresdataaddress extends Json2class {
+  city: string = '';
+  street: string = '';
+  zip: string = '';
+}</code></pre>
+                    </div>
+                    <div id="demo-kotlin" class="demo-content relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.kt">Json2http.kt (Plan + Agent + 实体类)</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// Kotlin — Plan + Agent + 实体类
+// ===== Plan 配置 =====
+val Plan = mapOf(
+  "/api/order/detail" to mapOf("method" to "GET", "title" to "订单详情")
+)
+
+// ===== Agent 请求方法 (okhttp) =====
+class Json2http {
+  companion object {
+    var setPlan: (p: Map&lt;String, Any&gt;) -> Unit
+    val single = Json2httpSingle()
+  }
+}
+
+// ===== 参数实体类 =====
+class Apiorderdetailparams : Json2class() {
+  var id: String = ""
+}
+
+// ===== 响应实体类 =====
+class Apiorderdetailres : Json2class() {
+  var code: Number = 0
+  var data: Apiorderdetailresdata = Apiorderdetailresdata()
+}
+
+class Apiorderdetailresdata : Json2class() {
+  var id: Number = 0
+  var status: String = ""
+  var items: List&lt;String&gt;? = null  // 可选字段
+  var total: Number = 0
+  var address: Apiorderdetailresdataaddress = Apiorderdetailresdataaddress()
+
+  fun fromJson(data: Map&lt;String, Any&gt;, rule: Rule? = null): Apiorderdetailresdata { /* ... */ }
+  fun toJson(): Map&lt;String, Any&gt; { /* ... */ }
+}
+
+class Apiorderdetailresdataaddress : Json2class() {
+  var city: String = ""
+  var street: String = ""
+  var zip: String = ""
+}</code></pre>
+                    </div>
+                    <div id="demo-swift" class="demo-content relative bg-gray-900/80 border border-gray-800 rounded-lg overflow-hidden hidden">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                            <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.swift">Json2http.swift (Plan + Agent + 实体类)</span>
+                        </div>
+                        <pre class="!m-0 !p-4 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// Swift — Plan + Agent + 实体类
+// ===== Plan 配置 =====
+let Plan = [
+  "/api/order/detail": ["method": "GET", "title": "订单详情"]
+]
+
+// ===== Agent 请求方法 (alamofire) =====
+class Json2http {
+  static var setPlan: (Any) -> Void
+  static let single = Json2httpSingle()
+}
+
+// ===== 参数实体类 =====
+class Apiorderdetailparams : Json2class {
+  var id: String = ""
+}
+
+// ===== 响应实体类 =====
+class Apiorderdetailres : Json2class {
+  var code: Number = 0
+  var data: Apiorderdetailresdata = Apiorderdetailresdata()
+}
+
+class Apiorderdetailresdata : Json2class {
+  var id: Number = 0
+  var status: String = ""
+  var items: [String]? = nil  // 可选字段
+  var total: Number = 0
+  var address: Apiorderdetailresdataaddress = Apiorderdetailresdataaddress()
+
+  func fromJson(_ data: Any, rule: Rule? = nil) -> Apiorderdetailresdata { /* ... */ }
+  func toJson() -> [String: Any] { /* ... */ }
+}
+
+class Apiorderdetailresdataaddress : Json2class {
+  var city: String = ""
+  var street: String = ""
+  var zip: String = ""
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ADVANCED ==================== -->
+        <section id="advanced" class="reveal-section py-20 md:py-28 bg-gray-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n="advanced.title">高级特性</h2>
+                    <p class="mt-4 text-gray-400" data-i18n="advanced.subtitle">类型引用、递归结构、自定义 Agent、Token 刷新</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4" data-i18n="advanced.card1.title">类型引用 & 递归结构</h3>
+                        <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden mb-3">
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.recursiveRef">tree.json5 — 递归引用</span>
+                            </div>
+                            <pre class="!m-0 !p-3 !bg-transparent text-sm overflow-x-auto"><code class="language-json5">{
+  "treeNode": {
+    "value": 0,
+    "left": { "$meta": { "ref": "/tree#/treeNode" } },
+    "right": { "$meta": { "ref": "/tree#/treeNode" } },
+  },
+}</code></pre>
+                        </div>
+                        <p class="text-sm text-gray-400" data-i18n-html="advanced.card1.desc">使用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> 引用自身实现递归类型（树、链表），也可跨文件引用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">/filename#/path</code>。</p>
+                    </div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4" data-i18n="advanced.card2.title">自定义 Agent & Token 刷新</h3>
+                        <div class="relative bg-gray-950 border border-gray-800 rounded-lg overflow-hidden mb-3">
+                            <div class="flex items-center justify-between px-4 py-2 border-b border-gray-800">
+                                <span class="text-xs text-gray-500 font-mono" data-i18n="demo.labels.customAgent">自定义 Agent 示例</span>
+                            </div>
+                            <pre class="!m-0 !p-3 !bg-transparent text-sm overflow-x-auto"><code class="language-typescript">// 替换特定接口的 Agent
+class XAgent extends Agent {
+  async fetch(plan: Plan): Promise&lt;Reply&gt; {
+    plan.reply.data = { statusCode: '0' };
+    return plan.reply;
+  }
+}
+
+Json2http.setPlan = (plan) => {
+  plan.agent = new XAgent();  // 全局替换
+};
+
+// Token 自动刷新
+plan.after = async () => {
+  if (plan.reply.error === 'token expired') {
+    const refreshed = await Json2http.single.refreshtoken((p) => {
+      p.headers['token'] = plan.headers['token'];
+    });
+    plan.headers['token'] = refreshed.res.data;
+    await plan.fetch();  // 自动重试
+  }
+};</code></pre>
+                        </div>
+                        <p class="text-sm text-gray-400" data-i18n-html="advanced.card2.desc">Agent 可全局替换或单次替换，支持 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">plan.after</code> 钩子实现 Token 刷新自动重试。</p>
+                    </div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4" data-i18n="advanced.card3.title">数据容错规则</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead><tr class="border-b border-gray-800"><th class="py-2 px-3 text-gray-400 text-left" data-i18n="advanced.card3.table.rule">规则</th><th class="py-2 px-3 text-gray-400 text-left" data-i18n="advanced.card3.table.scene">场景</th><th class="py-2 px-3 text-gray-400 text-left" data-i18n="advanced.card3.table.options">可选值</th></tr></thead>
+                                <tbody class="text-gray-300">
+                                    <tr class="border-b border-gray-800/50"><td class="py-2 px-3 font-mono text-brand-300">DiffType</td><td class="py-2 px-3" data-i18n="advanced.card3.table.typeMismatch">类型不匹配</td><td class="py-2 px-3 text-xs">Keep / Default / Null</td></tr>
+                                    <tr class="border-b border-gray-800/50"><td class="py-2 px-3 font-mono text-brand-300">MissKey</td><td class="py-2 px-3" data-i18n="advanced.card3.table.missingKey">字段缺失</td><td class="py-2 px-3 text-xs">Keep / Default / Null</td></tr>
+                                    <tr class="border-b border-gray-800/50"><td class="py-2 px-3 font-mono text-brand-300">MoreIndex</td><td class="py-2 px-3" data-i18n="advanced.card3.table.moreIndex">数组多余元素</td><td class="py-2 px-3 text-xs">Fill / Drop / Null</td></tr>
+                                    <tr><td class="py-2 px-3 font-mono text-brand-300">MissIndex</td><td class="py-2 px-3" data-i18n="advanced.card3.table.missIndex">数组缺失元素</td><td class="py-2 px-3 text-xs">Fill / drop / Null / Skip</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-400" data-i18n="advanced.card3.desc">三级配置：全局默认 → 实例级 → 单次调用级，灵活控制数据容错策略。</p>
+                    </div>
+                    <div class="bg-gray-900/60 border border-gray-800 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-4" data-i18n="advanced.card4.title">HTTP Body 类型支持</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 text-sm"><span class="inline-flex items-center justify-center w-12 h-8 rounded bg-brand-900/50 text-brand-400 font-mono text-xs">json</span><span class="text-gray-300" data-i18n="advanced.card4.body1">JSON 序列化请求体</span></div>
+                            <div class="flex items-center gap-3 text-sm"><span class="inline-flex items-center justify-center w-12 h-8 rounded bg-green-900/50 text-green-400 font-mono text-xs">map</span><span class="text-gray-300" data-i18n="advanced.card4.body2">URL-encoded 表单数据</span></div>
+                            <div class="flex items-center gap-3 text-sm"><span class="inline-flex items-center justify-center w-12 h-8 rounded bg-purple-900/50 text-purple-400 font-mono text-xs">form</span><span class="text-gray-300" data-i18n="advanced.card4.body3">Multipart 表单（支持文件上传）</span></div>
+                            <div class="flex items-center gap-3 text-sm"><span class="inline-flex items-center justify-center w-12 h-8 rounded bg-amber-900/50 text-amber-400 font-mono text-xs">plain</span><span class="text-gray-300" data-i18n="advanced.card4.body4">纯文本请求体</span></div>
+                            <div class="flex items-center gap-3 text-sm"><span class="inline-flex items-center justify-center w-12 h-8 rounded bg-cyan-900/50 text-cyan-400 font-mono text-xs">byte</span><span class="text-gray-300" data-i18n="advanced.card4.body5">二进制数据请求体</span></div>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-400" data-i18n-html="advanced.card4.note">微信小程序 Agent 对 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">form</code> 类型提供自定义 UTF-8 编码和 boundary 生成。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== FAQ ==================== -->
+        <section id="faq" class="reveal-section py-20 md:py-28 bg-gray-900/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-gray-100" data-i18n="faq.title">常见问题 — json2http JSON 转实体类 &amp; 小程序 Agent</h2>
+                </div>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q1">json2http 和 json2class 有什么区别？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n-html="faq.a1_p1">
+                            <p><strong class="text-gray-200">json2http</strong> 是主要工具，从 JSON5 接口配置生成完整的 HTTP 请求代码（Plan、Agent、参数/响应实体类），内置多种 Agent 适配各平台网络库。</p>
+                            <p class="mt-2"><strong class="text-gray-200">json2class</strong> 是 json2http 的底层依赖，负责生成实体类代码（fromJson/toJson 等序列化方法），也可独立使用于纯数据模型定义场景。</p>
+                            <p class="mt-2">需要接口请求时直接用 json2http，它会自动包含实体类生成能力。</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q2">微信小程序为什么要用 typescript_weixin@3 Agent？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n-html="faq.a2_p1">
+                            <p>微信小程序运行在沙箱环境中，不支持 XMLHttpRequest 和 fetch API。Axios 等库需要 polyfill 才能运行，增加包体积和兼容性风险。</p>
+                            <p class="mt-2"><code class="text-brand-300 bg-brand-900/30 px-1 rounded">typescript_weixin@3</code> 直接封装 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">wx.request()</code>，零依赖零 polyfill，还支持 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">require.async()</code> 分包懒加载，是微信小程序的最佳选择。</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q3">JSON5 和 JSON 有什么区别？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n="faq.a3">
+                            <p>JSON5 是 JSON 的扩展，支持注释、尾逗号、无引号键名、多行字符串等，更适合人类编写和阅读配置文件。json2http 同时支持 JSON 和 JSON5 格式输入。</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q4">可选字段怎么定义？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n-html="faq.a4_p1">
+                            <p>在字段名后加 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">?</code> 即可声明为可选（nullable）。例如 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">"email?": ""</code> 生成 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">email: string | null = null</code>。</p>
+                            <p class="mt-2">数组元素也可标记可选：<code class="text-brand-300 bg-brand-900/30 px-1 rounded">"items?": ["", null]</code> 表示数组本身可为 null，元素也可为 null。</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q5">生成的代码可以修改吗？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n-html="faq.a5">
+                            <p>生成的代码不建议手动修改，因为下次生成会覆盖。推荐通过 JSON 配置调整，或利用 Agent 继承机制扩展功能。json2http 的 Agent 是可替换的，你可以继承 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">Agent</code> 抽象类实现自定义逻辑。</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q6">支持哪些安装方式？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n-html="faq.a6">
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong class="text-gray-200">推荐</strong>：Node.js 环境 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">npx json2class build -l typescript@5</code></li>
+                                <li>Flutter/Dart：<code class="text-brand-300 bg-brand-900/30 px-1 rounded">dart pub add dev:json2class</code> + <code class="text-brand-300 bg-brand-900/30 px-1 rounded">dart run json2class build -l dart@3</code></li>
+                                <li>HarmonyOS：<code class="text-brand-300 bg-brand-900/30 px-1 rounded">ohpm install json2class --save-dev</code> + <code class="text-brand-300 bg-brand-900/30 px-1 rounded">ohpm run json2class</code></li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details class="bg-gray-900/60 border border-gray-800 rounded-lg group">
+                        <summary class="px-6 py-4 text-gray-200 font-medium cursor-pointer flex items-center justify-between">
+                            <span data-i18n="faq.q7">未来还会支持哪些语言？</span>
+                            <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div class="px-6 pb-4 text-sm text-gray-400 leading-relaxed" data-i18n="faq.a7">
+                            <p>计划支持 Java 和 Objective-C。当前已支持 Dart@3、ArkTS@12、TypeScript@5、Kotlin@1.3、Swift@5.7 等多种语言。</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== OPEN SOURCE ==================== -->
+        <section id="opensource" class="reveal-section py-16 bg-gray-950">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-100 mb-4" data-i18n="opensource.title">开源 & 免费</h2>
+                    <p class="text-gray-400 mb-8" data-i18n="opensource.subtitle">json2http 采用 ISC 协议开源，完全免费使用</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="https://github.com/yangfanzn/json2any" target="_blank" rel="noopener" class="inline-flex items-center px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition-colors border border-gray-700 text-sm">
+                            <svg class="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.51 0-.345-.015-1.26-.015-2.28-3.36.735-4.14-1.605-4.14-1.605-.555-1.425-1.35-1.8-1.35-1.8-1.11-.765.075-.765.075-.765 1.23.075 1.875 1.23 1.875 1.23 1.095 1.875 2.88 1.35 3.585.975.105-1.14.42-1.875.765-2.295-2.7-.3-5.52-1.35-5.52-6.03 0-1.35.495-2.46 1.23-3.36-.12-.3-.54-1.62.12-3.36 0 0 1.005-.3 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.53 3.3-1.23 3.3-1.23.66 1.74.24 3.06.12 3.36.765.9 1.23 2.01 1.23 3.36 0 4.68-2.82 5.73-5.52 6.03.42.36.81 1.095.81 2.295 0 1.65-.015 2.985-.015 3.39 0 .255.225.555.825.51C20.565 21.795 24 17.31 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                            <span data-i18n="opensource.btn1">GitHub 仓库</span>
+                        </a>
+                        <a href="https://www.npmjs.com/package/json2class" target="_blank" rel="noopener" class="inline-flex items-center px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition-colors border border-gray-700 text-sm">
+                            <svg class="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0L1.5 6v12l10.5 6 10.5-6V6L12 0zm0 2.16l8.49 4.832v9.68L12 21.52l-8.49-4.832V6.992L12 2.16z"/></svg>
+                            <span data-i18n="opensource.btn2">json2class npm</span>
+                        </a>
+                        <a href="https://www.npmjs.com/package/json2http" target="_blank" rel="noopener" class="inline-flex items-center px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition-colors border border-gray-700 text-sm">
+                            <svg class="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0L1.5 6v12l10.5 6 10.5-6V6L12 0zm0 2.16l8.49 4.832v9.68L12 21.52l-8.49-4.832V6.992L12 2.16z"/></svg>
+                            <span data-i18n="opensource.btn3">json2http npm</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="py-12 bg-gray-950 border-t border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg font-bold gradient-text">json2http</span>
+                    <span class="text-sm text-gray-500" data-i18n="footer.tagline">JSON → 多语言 HTTP 请求代码 & 实体类生成</span>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <span data-i18n="footer.copy">© 2024-2026 Yang Fan · ISC License</span> · <a href="https://github.com/yangfanzn/json2any" target="_blank" rel="noopener" class="text-gray-400 hover:text-brand-400 transition-colors">GitHub</a>
+                </div>
+            </div>
+            <div class="mt-6 text-xs text-gray-600 leading-relaxed" aria-hidden="true" data-i18n="footer.seo">
+                json2http 是一款 JSON 转 HTTP 请求代码生成工具，从 JSON5 接口配置一键生成 Plan + Agent + 参数/响应实体类，支持 TypeScript、Dart、ArkTS、Kotlin、Swift 等多种语言。内置多种 HTTP Agent（Axios、Fetch、WeixinAgent、Dio、RCP、OkHttp、Alamofire），专为微信小程序 TypeScript 开发优化，支持 wx.request 封装、分包懒加载、Token 自动刷新。json2http 生成完整的 HTTP 请求代码，json2class 作为底层依赖生成序列化反序列化实体类代码。JSON转HTTP代码、接口代码生成、小程序Agent、JSON5配置、多语言代码生成、类型安全请求。
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== SCRIPTS ==================== -->
+    <script>
+        // Mobile nav
+        const mobileOverlay = document.getElementById('mobileNavOverlay');
+        const mobilePanel = document.getElementById('mobileNavPanel');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        let isMobileNavOpen = false;
+
+        function openMobileNav() {
+            isMobileNavOpen = true;
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+            mobileOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            mobilePanel.classList.remove('translate-x-full');
+            // Switch hamburger to X
+            mobileMenuBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        }
+
+        function closeMobileNav() {
+            if (!isMobileNavOpen) return;
+            isMobileNavOpen = false;
+            mobileOverlay.classList.add('opacity-0', 'pointer-events-none');
+            mobilePanel.classList.add('translate-x-full');
+            // Restore body scroll
+            document.body.style.overflow = '';
+            // Switch X back to hamburger
+            mobileMenuBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
+        }
+
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isMobileNavOpen) {
+                closeMobileNav();
+            } else {
+                openMobileNav();
+            }
+        });
+
+        // Close when clicking anywhere on the page outside the panel
+        document.addEventListener('click', (e) => {
+            if (!isMobileNavOpen) return;
+            if (!mobilePanel.contains(e.target) && e.target !== mobileMenuBtn) {
+                closeMobileNav();
+            }
+        });
+
+        // ========== i18n ==========
+        const I18N = {
+            zh: {
+                // Nav
+                'nav.features': '功能',
+                'nav.weixin': '微信小程序',
+                'nav.tutorial': '教程',
+                'nav.demo': '演示',
+                'nav.faq': 'FAQ',
+                'nav.github': 'GitHub',
+                'nav.menu': '导航菜单',
+                'nav.close': '关闭菜单',
+                'nav.lang': 'English',
+                // Hero
+                'hero.title1': 'JSON 转 HTTP 请求代码',
+                'hero.title2': '一键生成多语言接口代码',
+                'hero.desc': '一份 JSON5 接口配置，自动生成 <strong class="text-brand-400">多种语言</strong> 的 HTTP 请求代码和实体类。内置 <strong class="text-brand-400">多种 Agent</strong>，专为 <strong class="text-brand-400">微信小程序 TypeScript</strong> 环境优化 <code class="text-brand-300 bg-brand-900/30 px-1.5 py-0.5 rounded text-sm font-mono">typescript_weixin@3</code>。',
+                'hero.badge1': 'JSON转HTTP代码',
+                'hero.badge2': '微信小程序TS',
+                'hero.badge3': '多Agent',
+                'hero.badge4': '接口代码生成',
+                'hero.badge5': '多语言',
+                'hero.cta1': '快速开始',
+                'hero.cta2': '查看源码',
+                'hero.install': '快速安装',
+                'hero.convert': 'JSON5 接口配置 → HTTP 请求代码',
+                'hero.arrow': '↓ 自动生成 ↓',
+                'hero.multi': '支持多种语言 × 多种 Agent',
+                'hero.gen': '// Plan + Agent + 实体类，一键生成',
+                // Features
+                'features.title': '核心能力：JSON 转实体类 & HTTP 请求代码',
+                'features.subtitle': 'json2http 从 JSON5 接口配置到类型安全的 HTTP 请求代码，覆盖请求生成、Agent 适配、序列化、容错处理全链路',
+                'features.card1.title': 'JSON → HTTP 请求代码',
+                'features.card1.desc': '一份 JSON5 接口配置，自动生成完整的 HTTP 请求代码（Plan + Agent + 参数/响应类），内置多种 Agent 适配各平台网络库。',
+                'features.card2.title': '序列化 / 反序列化',
+                'features.card2.desc': '生成的实体类自带 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromJson()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toJson()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromPreset()</code>、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toNew()</code> 四种方法，请求参数和响应数据自动序列化。',
+                'features.card3.title': '类型引用 & 递归支持',
+                'features.card3.desc': '通过 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> 引用跨文件类型，支持递归结构（如树形、链表），避免重复定义。',
+                'features.card4.title': '可选字段 & 默认值',
+                'features.card4.desc': '字段名加 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">?</code> 后缀即可声明可选（nullable），未标记字段自动赋予类型默认值，告别繁琐的 null 检查。',
+                'features.card5.title': '数据容错规则',
+                'features.card5.desc': '四种规则控制异常数据处理：<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">DiffType</code>（类型不匹配）、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissKey</code>（缺失字段）、<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MoreIndex</code>/<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissIndex</code>（数组越界），全局/实例/单次三级配置。',
+                'features.card6.title': 'JSON → 多语言实体类',
+                'features.card6.desc': 'json2class 是 json2http 的底层依赖，自动生成 Dart、ArkTS、TypeScript、Kotlin、Swift 等多种语言的类型安全实体类代码，也可独立使用。',
+                'features.card6.subtitle': '(底层依赖)',
+                // Weixin
+                'weixin.title': '微信小程序 TS Agent — 小程序 Agent 最佳实践',
+                'weixin.subtitle': '<code class="text-brand-300 bg-brand-900/30 px-2 py-1 rounded font-mono">typescript_weixin@3</code> — 专为微信小程序打造的 HTTP Agent',
+                'weixin.desc': 'json2http 是目前唯一内置微信小程序 TypeScript Agent 的 JSON 代码生成工具，直接封装 wx.request()，无需 polyfill，支持分包懒加载、Token 刷新、全局拦截。',
+                'weixin.stat1': 'wx.request()',
+                'weixin.stat1d': '原生封装，零 polyfill',
+                'weixin.stat2': 'require.async()',
+                'weixin.stat2d': '分包懒加载架构',
+                'weixin.stat3': 'setPlan',
+                'weixin.stat3d': '全局拦截 & Token 刷新',
+                'weixin.stat4': 'FormData',
+                'weixin.stat4d': '自定义 UTF-8 编码',
+                'weixin.step1': '编写 JSON5 接口配置',
+                'weixin.step2': '运行生成命令（指定微信小程序 Agent）',
+                'weixin.step3': '生成的 TypeScript 代码（自动包含 WeixinAgent）',
+                'weixin.step4': '在微信小程序中使用',
+                'weixin.why': '为什么选择 WeixinAgent 而不是 Axios 或 Fetch？',
+                'weixin.table.feature': '特性',
+                'weixin.table.native': '微信小程序原生支持',
+                'weixin.table.lazy': '分包懒加载',
+                'weixin.table.form': 'Multipart FormData',
+                'weixin.table.buffer': 'ArrayBuffer 支持',
+                'weixin.table.token': 'Token 自动刷新',
+                'weixin.table.size': '包体积影响',
+                'weixin.table.needPolyfill': '❌ 需 polyfill',
+                'weixin.table.needPolyfillWarn': '⚠️ 需 polyfill',
+                'weixin.table.customEncode': '✅ 自定义编码',
+                'weixin.table.partial': '⚠️ 部分',
+                'weixin.table.manual': '⚠️ 手动',
+                'weixin.table.zeroDep': '✅ 零依赖',
+                // Tutorial
+                'tutorial.title': '快速使用教程：TS 实体生成 & 接口代码',
+                'tutorial.json2http.h3': 'json2http — HTTP 请求代码生成',
+                'tutorial.subtitle': '三步上手 json2http，一份配置生成完整的 HTTP 请求代码',
+                'tutorial.step1': '安装 & 运行',
+                'tutorial.step2': '编写接口配置',
+                'tutorial.step3': '使用生成的代码',
+                'tutorial.json2class.title': 'json2class — 实体类生成',
+                'tutorial.json2class.subtitle': '(底层依赖，也可独立使用)',
+                'tutorial.json2class.s1': '安装',
+                'tutorial.json2class.s2': '配置',
+                'tutorial.json2class.s3': '使用',
+                'tutorial.weixin4.title': '微信小程序专项 — 四步上手',
+                'tutorial.weixin4.s1t': '生成代码',
+                'tutorial.weixin4.s1d': '指定 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">-a typescript_weixin@3</code> 生成微信小程序专用代码',
+                'tutorial.weixin4.s2t': '配置类型声明',
+                'tutorial.weixin4.s2d': '在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">project.d.ts</code> 中声明 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">IAppOption</code> 接口',
+                'tutorial.weixin4.s3t': '配置分包加载',
+                'tutorial.weixin4.s3d': '在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.json</code> 中添加 subPackages，在 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.ts</code> 中用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">require.async()</code> 懒加载',
+                'tutorial.weixin4.s4t': '页面中调用',
+                'tutorial.weixin4.s4d': '通过 <code class="text-brand-300 bg-brand-900/30 px-1 rounded">getApp().json2http</code> 获取实例，类型安全地调用接口',
+                'tutorial.cli.title': 'CLI 参数一览',
+                'tutorial.cli.param': '参数',
+                'tutorial.cli.desc': '说明',
+                'tutorial.cli.example': '示例',
+                'tutorial.cli.langDesc': '目标语言（必填）',
+                'tutorial.cli.agentDesc': 'HTTP Agent（json2http 专用）',
+                'tutorial.cli.searchDesc': 'JSON 配置搜索目录',
+                'tutorial.cli.outputDesc': '输出目录',
+                'tutorial.cli.packageDesc': '包名',
+                'tutorial.cli.debugDesc': '启用调试输出',
+                'tutorial.labels.generated': 'json2http.ts（生成产物）',
+                'tutorial.labels.typeDecl': 'project.d.ts — 类型声明',
+                'tutorial.labels.globalConfig': 'app.ts — 全局配置 & 分包加载',
+                'tutorial.labels.pageUsage': 'page.ts — 页面中使用',
+                // Demo
+                'demo.title': '代码生成演示：JSON 转实体类 & HTTP 请求',
+                'demo.subtitle': '一份 JSON5 接口配置 → Plan + Agent + 参数/响应实体类，一键生成完整的 HTTP 请求代码',
+                'demo.input': '输入：JSON5 接口配置',
+                'demo.output': '输出：HTTP 请求代码（Plan + Agent + 实体类）',
+                'demo.labels.ts': 'json2http.ts (Plan + Agent + 实体类)',
+                'demo.labels.dart': 'json2http.dart (Plan + Agent + 实体类)',
+                'demo.labels.arkts': 'json2http.ets (Plan + Agent + 实体类)',
+                'demo.labels.kt': 'Json2http.kt (Plan + Agent + 实体类)',
+                'demo.labels.swift': 'Json2http.swift (Plan + Agent + 实体类)',
+                'demo.labels.recursiveRef': 'tree.json5 — 递归引用',
+                'demo.labels.customAgent': '自定义 Agent 示例',
+                // Advanced
+                'advanced.title': '高级特性',
+                'advanced.subtitle': '类型引用、递归结构、自定义 Agent、Token 刷新',
+                'advanced.card1.title': '类型引用 & 递归结构',
+                'advanced.card1.desc': '使用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> 引用自身实现递归类型（树、链表），也可跨文件引用 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">/filename#/path</code>。',
+                'advanced.card2.title': '自定义 Agent & Token 刷新',
+                'advanced.card2.desc': 'Agent 可全局替换或单次替换，支持 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">plan.after</code> 钩子实现 Token 刷新自动重试。',
+                'advanced.card3.title': '数据容错规则',
+                'advanced.card3.table.rule': '规则',
+                'advanced.card3.table.scene': '场景',
+                'advanced.card3.table.options': '可选值',
+                'advanced.card3.table.typeMismatch': '类型不匹配',
+                'advanced.card3.table.missingKey': '字段缺失',
+                'advanced.card3.table.moreIndex': '数组多余元素',
+                'advanced.card3.table.missIndex': '数组缺失元素',
+                'advanced.card3.desc': '三级配置：全局默认 → 实例级 → 单次调用级，灵活控制数据容错策略。',
+                'advanced.card4.title': 'HTTP Body 类型支持',
+                'advanced.card4.body1': 'JSON 序列化请求体',
+                'advanced.card4.body2': 'URL-encoded 表单数据',
+                'advanced.card4.body3': 'Multipart 表单（支持文件上传）',
+                'advanced.card4.body4': '纯文本请求体',
+                'advanced.card4.body5': '二进制数据请求体',
+                'advanced.card4.note': '微信小程序 Agent 对 <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">form</code> 类型提供自定义 UTF-8 编码和 boundary 生成。',
+                // FAQ
+                'faq.title': '常见问题 — json2http JSON 转实体类 & 小程序 Agent',
+                'faq.q1': 'json2http 和 json2class 有什么区别？',
+                'faq.a1_p1': 'json2http 是主要工具，从 JSON5 接口配置生成完整的 HTTP 请求代码（Plan、Agent、参数/响应实体类）。json2class 是底层依赖，负责生成实体类代码（fromJson/toJson 等序列化方法），也可独立使用。',
+                'faq.a1_p2': '需要接口请求时直接用 json2http，它会自动包含实体类生成能力。',
+                'faq.q2': '微信小程序为什么要用 typescript_weixin@3 Agent？',
+                'faq.a2_p1': '微信小程序运行在沙箱环境中，不支持 XMLHttpRequest 和 fetch API。Axios 等库需要 polyfill 才能运行，增加包体积和兼容性风险。',
+                'faq.a2_p2': 'typescript_weixin@3 直接封装 wx.request()，零依赖零 polyfill，还支持 require.async() 分包懒加载，是微信小程序的最佳选择。',
+                'faq.q3': 'JSON5 和 JSON 有什么区别？',
+                'faq.a3': 'JSON5 是 JSON 的扩展，支持注释、尾逗号、无引号键名、多行字符串等，更适合人类编写和阅读配置文件。json2http 同时支持 JSON 和 JSON5 格式输入。',
+                'faq.q4': '可选字段怎么定义？',
+                'faq.a4_p1': '在字段名后加 ? 即可声明为可选（nullable）。例如 "email?": "" 生成 email: string | null = null。',
+                'faq.a4_p2': '数组元素也可标记可选："items?": ["", null] 表示数组本身可为 null，元素也可为 null。',
+                'faq.q5': '生成的代码可以修改吗？',
+                'faq.a5': '生成的代码不建议手动修改，因为下次生成会覆盖。推荐通过 JSON 配置调整，或利用 Agent 继承机制扩展功能。json2http 的 Agent 是可替换的，你可以继承 Agent 抽象类实现自定义逻辑。',
+                'faq.q6': '支持哪些安装方式？',
+                'faq.a6': '<ul class="list-disc list-inside space-y-1"><li>推荐：Node.js 环境 npx json2class build -l typescript@5</li><li>Flutter/Dart：dart pub add dev:json2class + dart run json2class build -l dart@3</li><li>HarmonyOS：ohpm install json2class --save-dev + ohpm run json2class</li></ul>',
+                'faq.q7': '未来还会支持哪些语言？',
+                'faq.a7': '计划支持 Java 和 Objective-C。当前已支持 Dart@3、ArkTS@12、TypeScript@5、Kotlin@1.3、Swift@5.7 等多种语言。',
+                // Open Source
+                'opensource.title': '开源 & 免费',
+                'opensource.subtitle': 'json2http 采用 ISC 协议开源，完全免费使用',
+                'opensource.btn1': 'GitHub 仓库',
+                'opensource.btn2': 'json2class npm',
+                'opensource.btn3': 'json2http npm',
+                // Footer
+                'footer.tagline': 'JSON → 多语言 HTTP 请求代码 & 实体类生成',
+                'footer.copy': '© 2024-2026 Yang Fan · ISC License',
+                'footer.seo': 'json2http 是一款 JSON 转 HTTP 请求代码生成工具，从 JSON5 接口配置一键生成 Plan + Agent + 参数/响应实体类，支持 TypeScript、Dart、ArkTS、Kotlin、Swift 等多种语言。内置多种 HTTP Agent（Axios、Fetch、WeixinAgent、Dio、RCP、OkHttp、Alamofire），专为微信小程序 TypeScript 开发优化，支持 wx.request 封装、分包懒加载、Token 自动刷新。json2http 生成完整的 HTTP 请求代码，json2class 作为底层依赖生成序列化反序列化实体类代码。JSON转HTTP代码、接口代码生成、小程序Agent、JSON5配置、多语言代码生成、类型安全请求。',
+            },
+            en: {
+                // Nav
+                'nav.features': 'Features',
+                'nav.weixin': 'WeChat Mini Program',
+                'nav.tutorial': 'Tutorial',
+                'nav.demo': 'Demo',
+                'nav.faq': 'FAQ',
+                'nav.github': 'GitHub',
+                'nav.menu': 'Navigation',
+                'nav.close': 'Close',
+                'nav.lang': '中文',
+                // Hero
+                'hero.title1': 'JSON to HTTP Request Code',
+                'hero.title2': 'One-click Multi-language API Code Generation',
+                'hero.desc': 'A single JSON5 config auto-generates HTTP request code and entity classes in <strong class="text-brand-400">multiple languages</strong>. Built-in <strong class="text-brand-400">multiple Agents</strong>, optimized for <strong class="text-brand-400">WeChat Mini Program TypeScript</strong> <code class="text-brand-300 bg-brand-900/30 px-1.5 py-0.5 rounded text-sm font-mono">typescript_weixin@3</code>.',
+                'hero.badge1': 'JSON→HTTP Code',
+                'hero.badge2': 'WeChat Mini Program TS',
+                'hero.badge3': 'Multi-Agent',
+                'hero.badge4': 'API Code Gen',
+                'hero.badge5': 'Multi-Language',
+                'hero.cta1': 'Quick Start',
+                'hero.cta2': 'View Source',
+                'hero.install': 'Quick Install',
+                'hero.convert': 'JSON5 Config → HTTP Request Code',
+                'hero.arrow': '↓ Auto Generated ↓',
+                'hero.multi': 'Multi-language × Multi-Agent',
+                'hero.gen': '// Plan + Agent + Entity classes, one-click generation',
+                // Features
+                'features.title': 'Core Features: JSON to Entity Classes & HTTP Request Code',
+                'features.subtitle': 'From JSON5 config to type-safe HTTP request code — covering request generation, Agent adaptation, serialization, and error tolerance.',
+                'features.card1.title': 'JSON → HTTP Request Code',
+                'features.card1.desc': 'A single JSON5 config auto-generates complete HTTP request code (Plan + Agent + param/response classes), with built-in multi-Agent support for various platform HTTP libraries.',
+                'features.card2.title': 'Serialization / Deserialization',
+                'features.card2.desc': 'Generated entity classes include <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromJson()</code>, <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toJson()</code>, <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">fromPreset()</code>, <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">toNew()</code> methods for automatic serialization.',
+                'features.card3.title': 'Type Reference & Recursion',
+                'features.card3.desc': 'Use <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> for cross-file type references, supporting recursive structures (trees, linked lists) without duplication.',
+                'features.card4.title': 'Optional Fields & Defaults',
+                'features.card4.desc': 'Add <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">?</code> suffix to field names for nullable declarations. Unmarked fields auto-assign type defaults — no more tedious null checks.',
+                'features.card5.title': 'Data Error Tolerance',
+                'features.card5.desc': 'Four rules for handling abnormal data: <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">DiffType</code>, <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissKey</code>, <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MoreIndex</code>/<code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">MissIndex</code>. Three-level config: global → instance → per-call.',
+                'features.card6.title': 'JSON → Multi-language Entity Classes',
+                'features.card6.desc': 'json2class is the underlying dependency of json2http, auto-generating type-safe entity classes for Dart, ArkTS, TypeScript, Kotlin, Swift and more. Can also be used standalone.',
+                'features.card6.subtitle': '(Underlying Dependency)',
+                // Weixin
+                'weixin.title': 'WeChat Mini Program TS Agent — Best Practices',
+                'weixin.subtitle': '<code class="text-brand-300 bg-brand-900/30 px-2 py-1 rounded font-mono">typescript_weixin@3</code> — HTTP Agent built for WeChat Mini Programs',
+                'weixin.desc': 'json2http is the only JSON code generation tool with a built-in WeChat Mini Program TypeScript Agent. Directly wraps wx.request() with zero polyfills, supporting subpackage lazy-loading, token refresh, and global interceptors.',
+                'weixin.stat1': 'wx.request()',
+                'weixin.stat1d': 'Native wrapper, zero polyfill',
+                'weixin.stat2': 'require.async()',
+                'weixin.stat2d': 'Subpackage lazy-loading',
+                'weixin.stat3': 'setPlan',
+                'weixin.stat3d': 'Global intercept & Token refresh',
+                'weixin.stat4': 'FormData',
+                'weixin.stat4d': 'Custom UTF-8 encoding',
+                'weixin.step1': 'Write JSON5 API Config',
+                'weixin.step2': 'Run generation command (specify WeChat Mini Program Agent)',
+                'weixin.step3': 'Generated TypeScript Code (auto-includes WeixinAgent)',
+                'weixin.step4': 'Use in WeChat Mini Program',
+                'weixin.why': 'Why choose WeixinAgent over Axios or Fetch?',
+                'weixin.table.feature': 'Feature',
+                'weixin.table.native': 'Native WeChat Support',
+                'weixin.table.lazy': 'Subpackage Lazy Loading',
+                'weixin.table.form': 'Multipart FormData',
+                'weixin.table.buffer': 'ArrayBuffer Support',
+                'weixin.table.token': 'Auto Token Refresh',
+                'weixin.table.size': 'Bundle Size Impact',
+                'weixin.table.needPolyfill': '❌ Needs polyfill',
+                'weixin.table.needPolyfillWarn': '⚠️ Needs polyfill',
+                'weixin.table.customEncode': '✅ Custom encoding',
+                'weixin.table.partial': '⚠️ Partial',
+                'weixin.table.manual': '⚠️ Manual',
+                'weixin.table.zeroDep': '✅ Zero dependency',
+                // Tutorial
+                'tutorial.title': 'Quick Tutorial: TS Entity Generation & API Code',
+                'tutorial.json2http.h3': 'json2http — HTTP Request Code Generation',
+                'tutorial.subtitle': 'Three steps to get started — one config generates complete HTTP request code',
+                'tutorial.step1': 'Install & Run',
+                'tutorial.step2': 'Write API Config',
+                'tutorial.step3': 'Use Generated Code',
+                'tutorial.json2class.title': 'json2class — Entity Class Generation',
+                'tutorial.json2class.subtitle': '(Underlying dependency, also standalone)',
+                'tutorial.json2class.s1': 'Install',
+                'tutorial.json2class.s2': 'Config',
+                'tutorial.json2class.s3': 'Usage',
+                'tutorial.weixin4.title': 'WeChat Mini Program — 4-Step Guide',
+                'tutorial.weixin4.s1t': 'Generate Code',
+                'tutorial.weixin4.s1d': 'Use <code class="text-brand-300 bg-brand-900/30 px-1 rounded">-a typescript_weixin@3</code> to generate WeChat-specific code',
+                'tutorial.weixin4.s2t': 'Configure Type Declarations',
+                'tutorial.weixin4.s2d': 'Declare <code class="text-brand-300 bg-brand-900/30 px-1 rounded">IAppOption</code> in <code class="text-brand-300 bg-brand-900/30 px-1 rounded">project.d.ts</code>',
+                'tutorial.weixin4.s3t': 'Configure Subpackage Loading',
+                'tutorial.weixin4.s3d': 'Add subPackages in <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.json</code>, use <code class="text-brand-300 bg-brand-900/30 px-1 rounded">require.async()</code> in <code class="text-brand-300 bg-brand-900/30 px-1 rounded">app.ts</code>',
+                'tutorial.weixin4.s4t': 'Call in Page',
+                'tutorial.weixin4.s4d': 'Get instance via <code class="text-brand-300 bg-brand-900/30 px-1 rounded">getApp().json2http</code>, call APIs with full type safety',
+                'tutorial.cli.title': 'CLI Parameters',
+                'tutorial.cli.param': 'Parameter',
+                'tutorial.cli.desc': 'Description',
+                'tutorial.cli.example': 'Example',
+                'tutorial.cli.langDesc': 'Target language (required)',
+                'tutorial.cli.agentDesc': 'HTTP Agent (json2http only)',
+                'tutorial.cli.searchDesc': 'JSON config search directory',
+                'tutorial.cli.outputDesc': 'Output directory',
+                'tutorial.cli.packageDesc': 'Package name',
+                'tutorial.cli.debugDesc': 'Enable debug output',
+                'tutorial.labels.generated': 'json2http.ts (Generated output)',
+                'tutorial.labels.typeDecl': 'project.d.ts — Type declaration',
+                'tutorial.labels.globalConfig': 'app.ts — Global config & subpackage loading',
+                'tutorial.labels.pageUsage': 'page.ts — Usage in page',
+                // Demo
+                'demo.title': 'Code Generation Demo: JSON to Entity Classes & HTTP Request',
+                'demo.subtitle': 'One JSON5 config → Plan + Agent + Param/Response entity classes, one-click generation of complete HTTP request code',
+                'demo.input': 'Input: JSON5 API Config',
+                'demo.output': 'Output: HTTP Request Code (Plan + Agent + Entity Classes)',
+                'demo.labels.ts': 'json2http.ts (Plan + Agent + Entity classes)',
+                'demo.labels.dart': 'json2http.dart (Plan + Agent + Entity classes)',
+                'demo.labels.arkts': 'json2http.ets (Plan + Agent + Entity classes)',
+                'demo.labels.kt': 'Json2http.kt (Plan + Agent + Entity classes)',
+                'demo.labels.swift': 'Json2http.swift (Plan + Agent + Entity classes)',
+                'demo.labels.recursiveRef': 'tree.json5 — Recursive reference',
+                'demo.labels.customAgent': 'Custom Agent example',
+                // Advanced
+                'advanced.title': 'Advanced Features',
+                'advanced.subtitle': 'Type References, Recursive Structures, Custom Agents, Token Refresh',
+                'advanced.card1.title': 'Type Reference & Recursive Structures',
+                'advanced.card1.desc': 'Use <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">$meta.ref</code> for self-referencing recursive types (trees, linked lists), also supports cross-file references <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">/filename#/path</code>.',
+                'advanced.card2.title': 'Custom Agent & Token Refresh',
+                'advanced.card2.desc': 'Agents can be replaced globally or per-call, with <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">plan.after</code> hook for automatic token refresh and retry.',
+                'advanced.card3.title': 'Data Error Tolerance Rules',
+                'advanced.card3.table.rule': 'Rule',
+                'advanced.card3.table.scene': 'Scenario',
+                'advanced.card3.table.options': 'Options',
+                'advanced.card3.table.typeMismatch': 'Type mismatch',
+                'advanced.card3.table.missingKey': 'Missing field',
+                'advanced.card3.table.moreIndex': 'Array extra element',
+                'advanced.card3.table.missIndex': 'Array missing element',
+                'advanced.card3.desc': 'Three-level config: global default → instance level → per-call, flexible data error tolerance strategy.',
+                'advanced.card4.title': 'HTTP Body Type Support',
+                'advanced.card4.body1': 'JSON serialized request body',
+                'advanced.card4.body2': 'URL-encoded form data',
+                'advanced.card4.body3': 'Multipart form (file upload)',
+                'advanced.card4.body4': 'Plain text request body',
+                'advanced.card4.body5': 'Binary data request body',
+                'advanced.card4.note': 'The WeChat Mini Program Agent provides custom UTF-8 encoding and boundary generation for <code class="text-brand-300 bg-brand-900/30 px-1 rounded text-xs">form</code> type.',
+                // FAQ
+                'faq.title': 'FAQ — json2http JSON to Entity Classes & Mini Program Agent',
+                'faq.q1': 'What is the difference between json2http and json2class?',
+                'faq.a1_p1': 'json2http is the main tool that generates complete HTTP request code (Plan, Agent, param/response entity classes) from JSON5 config. json2class is the underlying dependency for entity class code generation (fromJson/toJson methods), also usable standalone.',
+                'faq.a1_p2': 'Use json2http directly when you need API requests — it automatically includes entity class generation.',
+                'faq.q2': 'Why use typescript_weixin@3 Agent for WeChat Mini Programs?',
+                'faq.a2_p1': 'WeChat Mini Programs run in a sandboxed environment without XMLHttpRequest or fetch API. Libraries like Axios require polyfills, increasing bundle size and compatibility risks.',
+                'faq.a2_p2': 'typescript_weixin@3 directly wraps wx.request() with zero dependencies and zero polyfills. It also supports require.async() subpackage lazy-loading — the best choice for WeChat Mini Programs.',
+                'faq.q3': 'What is the difference between JSON5 and JSON?',
+                'faq.a3': 'JSON5 is an extension of JSON that supports comments, trailing commas, unquoted keys, multi-line strings, and more — making it far more human-friendly for config files. json2http supports both JSON and JSON5 format input.',
+                'faq.q4': 'How to define optional fields?',
+                'faq.a4_p1': 'Add ? after the field name to declare it as optional (nullable). E.g., "email?": "" generates email: string | null = null.',
+                'faq.a4_p2': 'Array elements can also be marked optional: "items?": ["", null] means the array itself can be null and elements can be null too.',
+                'faq.q5': 'Can I modify the generated code?',
+                'faq.a5': 'Manual modification is not recommended, as the next generation will overwrite changes. Instead, adjust via JSON config, or extend functionality through Agent inheritance. json2http Agents are replaceable — you can extend the Agent abstract class with custom logic.',
+                'faq.q6': 'What installation methods are supported?',
+                'faq.a6': '<ul class="list-disc list-inside space-y-1"><li>Recommended: Node.js npx json2class build -l typescript@5</li><li>Flutter/Dart: dart pub add dev:json2class + dart run json2class build -l dart@3</li><li>HarmonyOS: ohpm install json2class --save-dev + ohpm run json2class</li></ul>',
+                'faq.q7': 'What languages will be supported in the future?',
+                'faq.a7': 'Java and Objective-C are planned. Currently supports Dart@3, ArkTS@12, TypeScript@5, Kotlin@1.3, Swift@5.7 and more.',
+                // Open Source
+                'opensource.title': 'Open Source & Free',
+                'opensource.subtitle': 'json2http is open-sourced under the ISC license, completely free to use',
+                'opensource.btn1': 'GitHub Repository',
+                'opensource.btn2': 'json2class npm',
+                'opensource.btn3': 'json2http npm',
+                // Footer
+                'footer.tagline': 'JSON → Multi-language HTTP Request Code & Entity Class Generation',
+                'footer.copy': '© 2024-2026 Yang Fan · ISC License',
+                'footer.seo': 'json2http is a JSON-to-HTTP request code generation tool. From a single JSON5 API config, it generates Plan + Agent + param/response entity classes, supporting TypeScript, Dart, ArkTS, Kotlin, Swift, and more. Built-in multiple HTTP Agents (Axios, Fetch, WeixinAgent, Dio, RCP, OkHttp, Alamofire), optimized for WeChat Mini Program TypeScript development with wx.request wrapper, subpackage lazy-loading, and auto token refresh. json2http generates complete HTTP request code, and json2class serves as the underlying dependency for serialization/deserialization entity classes.',
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || (navigator.language?.startsWith('zh') ? 'zh' : 'en');
+        function applyLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            const dict = I18N[lang];
+            // Update data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (dict[key] !== undefined) el.textContent = dict[key];
+            });
+            // Update data-i18n-html elements (for rich text)
+            document.querySelectorAll('[data-i18n-html]').forEach(el => {
+                const key = el.dataset.i18nHtml;
+                if (dict[key] !== undefined) el.innerHTML = dict[key];
+            });
+            // Update button labels
+            const btn = document.getElementById('langToggle');
+            if (btn) btn.textContent = lang === 'zh' ? 'EN' : '中';
+            const mBtn = document.getElementById('mobileLangLabel');
+            if (mBtn) mBtn.textContent = lang === 'zh' ? 'English' : '中文';
+            // Update html lang attr
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+        }
+        function toggleLang() {
+            applyLang(currentLang === 'zh' ? 'en' : 'zh');
+        }
+        applyLang(currentLang);
+
+        // Demo tab switching
+        function switchDemoTab(lang) {
+            document.querySelectorAll('.demo-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('demo-' + lang);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('.demo-tab').forEach(tab => {
+                if (tab.dataset.lang === lang) {
+                    tab.classList.remove('bg-gray-800', 'text-gray-400');
+                    tab.classList.add('bg-brand-600', 'text-white');
+                } else {
+                    tab.classList.remove('bg-brand-600', 'text-white');
+                    tab.classList.add('bg-gray-800', 'text-gray-400');
+                }
+            });
+            if (target) Prism.highlightAllUnder(target);
+        }
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal-section').forEach(s => observer.observe(s));
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+            });
+        });
+
+        // Active nav highlight
+        const sections = ['hero', 'features', 'weixin', 'tutorial', 'demo', 'faq'];
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(id => {
+                const s = document.getElementById(id);
+                if (s && window.pageYOffset >= s.offsetTop - 120) current = id;
+            });
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('text-brand-400');
+                    link.classList.remove('text-gray-400');
+                } else {
+                    link.classList.remove('text-brand-400');
+                    link.classList.add('text-gray-400');
+                }
+            });
+        });
+
+        // Re-highlight on load
+        document.addEventListener('DOMContentLoaded', () => Prism.highlightAll());
+    </script>
+</body>
+</html>
