@@ -2,24 +2,4 @@ name = "json2any"
 compatibility_date = "2026-06-06"
 
 [assets]
-directory = "./src"
-
-[[routes]]
-pattern = "www.yangfanzn.com"
-custom_domain = true
-
-[[routes]]
-pattern = "json2http.yangfanzn.com"
-custom_domain = true
-
-[[routes]]
-pattern = "json2any.yangfanzn.com"
-custom_domain = true
-
-# staging 环境域名（dev 分支 push 时 npx wrangler deploy --env staging 使用）
-[env.staging.assets]
-directory = "./src"
-
-[[env.staging.routes]]
-pattern = "json2http-dev.yangfanzn.com"
-custom_domain = true
+directory = "./dist"
