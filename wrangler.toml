@@ -1,5 +1,8 @@
 name = "json2any"
 compatibility_date = "2026-06-06"
 
+workers_dev = false
+preview_urls = true
+
 [assets]
 directory = "./src"
