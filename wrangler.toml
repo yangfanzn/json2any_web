@@ -2,14 +2,14 @@ name = "json2any"
 compatibility_date = "2026-06-06"
 
 [assets]
-directory = "./dist"
+directory = "./src"
 
 # staging 环境
 [env.staging]
 name = "json2any-staging"
 
 [env.staging.assets]
-directory = "./dist"
+directory = "./src"
 
 [[env.staging.routes]]
 pattern = "json2http-dev.yangfanzn.com"
